@@ -28,7 +28,7 @@ public class StatsDaoImpl implements StatsDao {
     private final JdbcTemplate template;
 
     private XSSFWorkbook workbook;
-    //private XSSFSheet sheet;
+    private XSSFSheet sheet;
 
     private int row;
     private Logger logger = LoggerFactory.getLogger(StatsDaoImpl.class);
@@ -36,13 +36,12 @@ public class StatsDaoImpl implements StatsDao {
     @Autowired
     public StatsDaoImpl(JdbcTemplate template) {
         this.template = template;
-        createWorkbook();
     }
 
     private XSSFSheet createWorkbook(){
         workbook = new XSSFWorkbook();
 
-        XSSFSheet sheet = workbook.createSheet("Statistieken MedSec");
+        sheet = workbook.createSheet("Statistieken MedSec");
         sheet.setDefaultColumnWidth(30);
 
         // Style
@@ -175,8 +174,7 @@ public class StatsDaoImpl implements StatsDao {
         } else {
 
             template.query(selectSQLExcel, new Object[]{startDate.toString(), endDate.plusDays(1).toString()}, rs -> {
-                XSSFWorkbook workbook = new XSSFWorkbook();
-                XSSFSheet sheet = createWorkbook();
+                createWorkbook();
                 while (rs.next()) {
                     // Get data from database:
                     String typiste = rs.getString(1);
@@ -219,16 +217,11 @@ public class StatsDaoImpl implements StatsDao {
 
     @Override
     public String getNameSecretary(String username){
-       final String[] firstName = {""};
-       final String[] lastName = {""};
         String sqlId = "SELECT person_id FROM global_user where username=?";
         int person_id = template.queryForObject(sqlId, new Object[] {username}, (rs, i) -> rs.getInt("person_id"));
         String sqlName = "SELECT firstName, lastName FROM personalinfo_person WHERE id=?";
-       return template.queryForObject(sqlName, new Object[]{person_id}, (rs, i) -> {
-            firstName[0] = rs.getString("firstName");
-            lastName[0] = rs.getString("lastName");
-            return firstName[0] + " " + lastName[0];
-        });
+
+       return template.queryForObject(sqlName, new Object[]{person_id}, (rs, i) -> rs.getString("firstName") + " " +  rs.getString("lastName"));
     }
 
     @Override

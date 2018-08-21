@@ -39,7 +39,7 @@ public class StatistiekenController {
     @FXML
     private TextArea txtaLastLetterTyped;
     @FXML
-    private TextField newTypiste = new TextField();
+    private TextField newTypiste;
     @FXML
     private Text secretaryAdded;
 
@@ -60,7 +60,6 @@ public class StatistiekenController {
         lblActiveUsers.setVisible(false);
         txtaFirstLetterTyped.setVisible(false);
         txtaLastLetterTyped.setVisible(false);
-        newTypiste.setPromptText("username");
     }
 
     @FXML
