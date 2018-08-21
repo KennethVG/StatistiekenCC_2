@@ -30,7 +30,6 @@ public class StatsDaoImpl implements StatsDao {
     private XSSFWorkbook workbook;
     private XSSFSheet sheet;
 
-    private int row;
     private Logger logger = LoggerFactory.getLogger(StatsDaoImpl.class);
 
     @Autowired
@@ -38,7 +37,7 @@ public class StatsDaoImpl implements StatsDao {
         this.template = template;
     }
 
-    private XSSFSheet createWorkbook(){
+    private void createWorkbook() {
         workbook = new XSSFWorkbook();
 
         sheet = workbook.createSheet("Statistieken MedSec");
@@ -52,7 +51,7 @@ public class StatsDaoImpl implements StatsDao {
         style.setFont(font);
 
         // Create header row:
-        Row header = sheet.createRow(row++);
+        Row header = sheet.createRow(0);
         Cell c = header.createCell(0);
         c.setCellValue("Naam typiste:");
         c.setCellStyle(style);
@@ -65,8 +64,6 @@ public class StatsDaoImpl implements StatsDao {
         Cell c3 = header.createCell(3);
         c3.setCellStyle(style);
         c3.setCellValue("Aanmaakdatum brief:");
-
-        return sheet;
     }
 
     private void showAlertDialog() {
@@ -88,7 +85,7 @@ public class StatsDaoImpl implements StatsDao {
         return result[0];
     }
 
-    private List<Integer> getTypisten(){
+    private List<Integer> getTypisten() {
         String sql = "SELECT id from Global_User where usertype=1";
         return template.query(sql, (rs, i) -> rs.getInt("id"));
     }
@@ -147,7 +144,7 @@ public class StatsDaoImpl implements StatsDao {
         return result.toString();
     }
 
-    private String getFastStatsWithOneResultBetweenTwoDates(String sql, LocalDate startDate, LocalDate endDate){
+    private String getFastStatsWithOneResultBetweenTwoDates(String sql, LocalDate startDate, LocalDate endDate) {
         StringBuilder result = new StringBuilder();
         if (startDate == null || endDate == null) {
             showAlertDialog();
@@ -175,6 +172,7 @@ public class StatsDaoImpl implements StatsDao {
 
             template.query(selectSQLExcel, new Object[]{startDate.toString(), endDate.plusDays(1).toString()}, rs -> {
                 createWorkbook();
+                int count = 1; // 0= header of Excel file
                 while (rs.next()) {
                     // Get data from database:
                     String typiste = rs.getString(1);
@@ -183,7 +181,7 @@ public class StatsDaoImpl implements StatsDao {
                     String aanmaakdatum = rs.getString(4);
 
                     // Create new row per record:
-                    Row r = sheet.createRow(row++);
+                    Row r = sheet.createRow(count++);
                     Cell cell = r.createCell(0);
                     cell.setCellValue(typiste);
                     Cell cell1 = r.createCell(1);
@@ -210,18 +208,18 @@ public class StatsDaoImpl implements StatsDao {
     }
 
     @Override
-    public Integer addSecretary(String username){
+    public Integer addSecretary(String username) {
         String sql = "UPDATE global_user set usertype=1 WHERE username=?";
         return template.update(sql, username);
     }
 
     @Override
-    public String getNameSecretary(String username){
+    public String getNameSecretary(String username) {
         String sqlId = "SELECT person_id FROM global_user where username=?";
-        int person_id = template.queryForObject(sqlId, new Object[] {username}, (rs, i) -> rs.getInt("person_id"));
+        int person_id = template.queryForObject(sqlId, new Object[]{username}, (rs, i) -> rs.getInt("person_id"));
         String sqlName = "SELECT firstName, lastName FROM personalinfo_person WHERE id=?";
 
-       return template.queryForObject(sqlName, new Object[]{person_id}, (rs, i) -> rs.getString("firstName") + " " +  rs.getString("lastName"));
+        return template.queryForObject(sqlName, new Object[]{person_id}, (rs, i) -> rs.getString("firstName") + " " + rs.getString("lastName"));
     }
 
     @Override
@@ -236,7 +234,7 @@ public class StatsDaoImpl implements StatsDao {
                 + "JOIN global_user gus ON gus.id = ltr.assistant_id "
                 + "WHERE ltr.status= 'FINAL' AND ltr.lastModificationDate > ? and ltr.lastModificationDate < ? "
                 + "ORDER BY ltr.creationDate;";
-       return getFastStatsWithOneResultBetweenTwoDates(selectSQLOldestLetter, startDate, endDate);
+        return getFastStatsWithOneResultBetweenTwoDates(selectSQLOldestLetter, startDate, endDate);
     }
 
     @Override
