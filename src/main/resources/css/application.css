@@ -1,0 +1,46 @@
+.background {
+    -fx-background-color:#FFFFFF;
+}
+
+.button { 
+    -fx-background-color: #307CAB;
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    -fx-text-fill: #FFFFFF;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #d8d8d8;
+    -fx-text-fill: #000000;
+}
+
+.button:pressed, .button:default:hover:pressed {
+  -fx-background-color: #FFFFFF;
+  -fx-text-fill: #000000;
+}
+
+.button:default {
+    -fx-background-color: -fx-focus-color;
+    -fx-text-fill: #ffffff;
+}
+
+.button:default:hover {
+    -fx-background-color: derive(-fx-focus-color,30.0%);
+}
+
+.dialog-pane {
+    -fx-background-color: black;
+}
+
+.dialog-pane .label {
+    -fx-text-fill: white;
+}
+
+.dialog-pane:header .header-panel {
+    -fx-background-color: black;
+}
+
+.dialog-pane:header .header-panel .label {
+    -fx-font-style: italic;
+    -fx-font-size: 2.0em;
+}
