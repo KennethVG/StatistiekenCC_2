@@ -30,7 +30,7 @@ public class StatsDaoImpl implements StatsDao {
     private XSSFWorkbook workbook;
     private XSSFSheet sheet;
 
-    private Logger logger = LoggerFactory.getLogger(StatsDaoImpl.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(StatsDaoImpl.class);
 
     @Autowired
     public StatsDaoImpl(JdbcTemplate template) {
@@ -97,7 +97,7 @@ public class StatsDaoImpl implements StatsDao {
             showAlertDialog();
         } else {
             List<Integer> typisten = getTypisten();
-            logger.info(typisten.toString());
+            LOGGER.info(typisten.toString());
             for (int t : typisten) {
                 String s = "";
                 try {
